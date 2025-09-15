@@ -14,4 +14,4 @@ jobs:
     - name: Build the Docker image
       run: docker build . -t nhpiash/chatesyle
       run: echo"${{secrets.DOCKER_HUB_PASSWORD}}"| docker login -u ${{secrets.DOCKER_HUB_USERNAME}} --password-stdin
-      run: docker push ${{secrets.DOCKER_HUB_USERNAME}}/chatesyle:latest
+      run: docker push nhpiash/chatesyle:latest
