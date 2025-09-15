@@ -9,7 +9,7 @@ services:
     container_name: chatesyle-app
     restart: unless-stopped
     ports:
-      - "8006:80"            # APP_URL in your .env uses port 8000
+      - "8007:80"
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
@@ -21,53 +21,51 @@ services:
       - DB_USERNAME=root
       - DB_PASSWORD=
     volumes:
-      - ./:/var/www/html     # mount project for live dev
+      - ./:/var/www/html
     depends_on:
-      mysql-db:
+      chatesyle-db:
         condition: service_healthy
     networks:
-      - app-network
+      - chatesyle-network
 
-  mysql-db:
+  chatesyle-db:
     image: mysql:8.0
-    container_name: mysql-chatesyle
+    container_name: chatesyle-db
     restart: unless-stopped
-    env_file:                      # optional: pick up values from local .env if desired
-      - .env
     environment:
       MYSQL_DATABASE: chatesyle
-      MYSQL_ROOT_PASSWORD: ""       # empty root password allowed via MYSQL_ALLOW_EMPTY_PASSWORD
+      MYSQL_ROOT_PASSWORD: ""
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_ROOT_HOST: "%"
-    volumes:
-      - dbdata:/var/lib/mysql
     ports:
-      - "3400:3306"
+      - "3308:3306"   # host:container, so XAMPP’s MySQL doesn’t block you
+    volumes:
+      - chatesyle-dbdata:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - app-network
+      - chatesyle-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin-chatesyle
+    container_name: chatesyle-phpmyadmin
     restart: unless-stopped
     environment:
       PMA_HOST: chatesyle-db
       PMA_PORT: 3306
     ports:
-      - "8086:80"
+      - "8088:80"
     depends_on:
       - chatesyle-db
     networks:
-      - app-network
+      - chatesyle-network
 
 volumes:
-  dbdata:
+  chatesyle-dbdata:
 
 networks:
-  app-network:
+  chatesyle-network:
     driver: bridge
